@@ -1,0 +1,66 @@
+diff --git a/package/base-files/files/bin/config_generate b/package/base-files/files/bin/config_generate
+index 596fcf41fa..f35745e07f 100755
+--- a/package/base-files/files/bin/config_generate
++++ b/package/base-files/files/bin/config_generate
+@@ -161,7 +161,7 @@ generate_network() {
+ 		static)
+ 			local ipad
+ 			case "$1" in
+-				lan) ipad=${ipaddr:-"192.168.1.1"} ;;
++				lan) ipad=${ipaddr:-"192.168.2.1"} ;;
+ 				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
+ 			esac
+ 
+@@ -302,7 +302,8 @@ generate_static_system() {
+ 		delete system.@system[0]
+ 		add system system
+ 		set system.@system[-1].hostname='OpenWrt'
+-		set system.@system[-1].timezone='UTC'
++		set system.@system[-1].zonename='Asia/Shanghai'
++		set system.@system[-1].timezone='CST-8'
+ 		set system.@system[-1].ttylogin='0'
+ 		set system.@system[-1].log_size='64'
+ 		set system.@system[-1].urandom_seed='0'
+diff --git a/package/base-files/files/etc/shadow b/package/base-files/files/etc/shadow
+index 39bdb9c90a..4c7d8586b7 100644
+--- a/package/base-files/files/etc/shadow
++++ b/package/base-files/files/etc/shadow
+@@ -1,4 +1,4 @@
+-root:::0:99999:7:::
++root:$1$LSBSdnpI$FHd0relIz3m6nMwndonTW1:18744:0:99999:7:::
+ daemon:*:0:0:99999:7:::
+ ftp:*:0:0:99999:7:::
+ network:*:0:0:99999:7:::
+diff --git a/package/base-files/files/etc/sysctl.conf b/package/base-files/files/etc/sysctl.conf
+index ae04212f42..68d9c2ae96 100644
+--- a/package/base-files/files/etc/sysctl.conf
++++ b/package/base-files/files/etc/sysctl.conf
+@@ -1 +1,2 @@
+ # Defaults are configured in /etc/sysctl.d/* and can be customized in this file
++net.netfilter.nf_conntrack_max=65535
+diff --git a/package/kernel/mac80211/files/lib/wifi/mac80211.sh b/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+index 6aa46b0c74..6f20f74c46 100644
+--- a/package/kernel/mac80211/files/lib/wifi/mac80211.sh
++++ b/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+@@ -174,7 +174,7 @@ detect_mac80211() {
+ 			set wireless.radio${devidx}.channel=${channel}
+ 			set wireless.radio${devidx}.band=${mode_band}
+ 			set wireless.radio${devidx}.htmode=$htmode
+-			set wireless.radio${devidx}.disabled=1
++			set wireless.radio${devidx}.disabled=0
+ 
+ 			set wireless.default_radio${devidx}=wifi-iface
+ 			set wireless.default_radio${devidx}.device=radio${devidx}
+diff --git a/package/network/services/dnsmasq/files/dhcp.conf b/package/network/services/dnsmasq/files/dhcp.conf
+index 8c42ef782e..466794b22e 100644
+--- a/package/network/services/dnsmasq/files/dhcp.conf
++++ b/package/network/services/dnsmasq/files/dhcp.conf
+@@ -25,7 +25,7 @@ config dnsmasq
+ config dhcp lan
+ 	option interface	lan
+ 	option start 	100
+-	option limit	150
++	option limit	50
+ 	option leasetime	12h
+ 
+ config dhcp wan
